@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub') // Credencial para Docker Hub
+    }
+
+    stages {
+        stage('Clonar Repositorio') {
+            steps {
+                git 'https://github.com/Inn0mbr4blE/PruebaDevOps.git'
+            }
+        }
+
+        stage('Pruebas Unitarias con pytest') {
+            steps {
+                sh 'pytest'
+            }
+        }
+
+        stage('Construir y Publicar Imagen Docker') {
+            steps {
+                script {
+                    def dockerImage = docker.build('inn0mbr4ble/pruebaDevOps', '.')
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub') {
+
+                    dockerImage.push()
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline ejecutado exitosamente!'
+        }
+        failure {
+            echo 'Ocurrió un error en el pipeline :('
+        }
+    }
+}
