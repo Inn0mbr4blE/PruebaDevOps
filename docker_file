@@ -1,0 +1,8 @@
+FROM python:3.9-slim
+WORKDIR /app
+COPY prueba.py .
+COPY templates ./templates
+RUN pip install Flask
+EXPOSE 5000
+ENV FLASK_APP=prueba.py
+CMD ["flask", "run", "--host=0.0.0.0"]
